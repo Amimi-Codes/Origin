@@ -20,7 +20,10 @@
       :root {
         /* The tavern is 240 x 180 pixel-art units. --w is how wide it's drawn,
            --u is one art pixel, so everything below is placed in art pixels. */
-        --w: max(100vw, 133.34svh);
+        /* fill the screen, but never zoom past a 9:5 view, or the title
+           lands on the portals and the side tables drift off */
+        --w: clamp(133.34vh, 100vw, 180vh);
+        --w: clamp(133.34svh, 100vw, 180svh);
         --u: calc(var(--w) / 240);
         --gold: #e8b45a;
         --parch: #f4ead6;
@@ -36,6 +39,28 @@
         background: #0b0806;
         color: var(--parch);
         font-family: "DM Sans", system-ui, sans-serif;
+      }
+      /* fixed, clipped frame: the art is wider than a phone, and mobile
+         browsers otherwise let the page pan sideways off-centre */
+      .frame {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+      }
+      .backdrop {
+        position: absolute;
+        inset: -20px;
+        width: calc(100% + 40px);
+        height: calc(100% + 40px);
+        object-fit: cover;
+        object-position: center bottom;
+        filter: blur(8px) brightness(0.45);
+      }
+      @media (min-aspect-ratio: 9/5) {
+        /* very wide screens: soften the scene's edges into the backdrop */
+        .scene {
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+        }
       }
       .scene {
         position: absolute;
@@ -71,7 +96,7 @@
       }
       h1 {
         margin: 0;
-        font: 400 clamp(4rem, 13vw, 9rem) / 1.1 "PixelPurl", monospace;
+        font: 400 clamp(3rem, min(13vw, 16vh), 9rem) / 1.1 "PixelPurl", monospace;
         letter-spacing: 0.04em;
         text-shadow: 6px 6px 0 #3a0a06;
       }
@@ -270,25 +295,28 @@
     </style>
   </head>
   <body>
-    <div class="scene">
-      <img class="art" src="assets/tavern-back.svg" alt="" />
-      <img class="art" src="assets/tavern-front.svg" alt="" />
+    <div class="frame">
+      <img class="backdrop" src="assets/tavern-back.svg" alt="" />
+      <div class="scene">
+        <img class="art" src="assets/tavern-back.svg" alt="" />
+        <img class="art" src="assets/tavern-front.svg" alt="" />
 
-      <a class="portal l" href="builder.html" style="--x: 33; --y: 138; --glow: #e6ecf8">
-        <img class="gate" src="assets/portal-white.svg" alt="" />
-        <span class="label"><b>Start from scratch</b><small>Build every choice</small></span>
-      </a>
-      <a class="portal" href="builder.html#ready" style="--x: 120; --y: 132; --glow: #8a5ae0">
-        <img class="gate" src="assets/portal-purple.svg" alt="" />
-        <span class="label"><b>Use <span class="nw">ready-made</span></b><small>Pick a hero &amp; tweak</small></span>
-      </a>
-      <a class="portal r" href="builder.html#quick" style="--x: 207; --y: 138; --glow: #e0404e">
-        <img class="gate" src="assets/portal-red.svg" alt="" />
-        <span class="label"><b>Bardic Inspiration</b><small>A few quick questions</small></span>
-      </a>
+        <a class="portal l" href="builder.html" style="--x: 33; --y: 138; --glow: #e6ecf8">
+          <img class="gate" src="assets/portal-white.svg" alt="" />
+          <span class="label"><b>Start from scratch</b><small>Build every choice</small></span>
+        </a>
+        <a class="portal" href="builder.html#ready" style="--x: 120; --y: 132; --glow: #8a5ae0">
+          <img class="gate" src="assets/portal-purple.svg" alt="" />
+          <span class="label"><b>Use <span class="nw">ready-made</span></b><small>Pick a hero &amp; tweak</small></span>
+        </a>
+        <a class="portal r" href="builder.html#quick" style="--x: 207; --y: 138; --glow: #e0404e">
+          <img class="gate" src="assets/portal-red.svg" alt="" />
+          <span class="label"><b>Bardic Inspiration</b><small>A few quick questions</small></span>
+        </a>
 
-      <div class="soul" id="soul"><img src="assets/soul.svg" alt="" /></div>
-      <p class="hint">Choose a portal</p>
+        <div class="soul" id="soul"><img src="assets/soul.svg" alt="" /></div>
+        <p class="hint">Choose a portal</p>
+      </div>
     </div>
     <div class="shade"></div>
     <header class="title">
