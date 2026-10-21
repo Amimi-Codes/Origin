@@ -2,55 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-    <title>Mimi's D&D Character Builder</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@400;600;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
+    <title>Origin</title>
+    <!-- The builder now lives on the main page; forward old links (and their #ready / #quick) there -->
+    <script>location.replace("./" + location.hash);</script>
+    <meta http-equiv="refresh" content="0; url=./" />
   </head>
   <body>
-    <div class="app">
-      <div id="v"></div>
-      <div class="sum" id="sum"></div>
-    </div>
-    <div class="modal" id="m">
-      <div class="sheet">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <h2>All Species</h2>
-          <button class="nav" id="x">✕ Close</button>
-        </div>
-        <div class="grid" id="gr"></div>
-      </div>
-    </div>
-    <div class="modal" id="m2">
-      <div class="sheet">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <h2 id="m2t"></h2>
-          <button class="nav" id="x2">✕ Close</button>
-        </div>
-        <div id="m2b"></div>
-      </div>
-    </div>
-    <script src="data.js"></script>
-    <script src="spellsData.js"></script>
-    <script src="spellManager.js"></script>
-    <script src="script.js"></script>
+    <a href="./">Continue to Origin</a>
   </body>
 </html>

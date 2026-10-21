@@ -6,11 +6,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>Origin · Choose your path</title>
+    <title>Origin · D&amp;D Character Builder</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=DM+Sans:wght@500;700;800&family=Nunito:wght@400;600;800&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- tavern launch screen; everything is scoped to #launch so it can't touch the builder -->
     <style>
       @font-face {
         font-family: "PixelPurl";
@@ -28,26 +30,28 @@
         --gold: #e8b45a;
         --parch: #f4ead6;
       }
-      * {
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        margin: 0;
-        height: 100%;
+      body.tavern {
         overflow: hidden;
+      }
+      #launch {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
         background: #0b0806;
         color: var(--parch);
         font-family: "DM Sans", system-ui, sans-serif;
       }
+      #launch[hidden] {
+        display: none;
+      }
       /* fixed, clipped frame: the art is wider than a phone, and mobile
          browsers otherwise let the page pan sideways off-centre */
-      .frame {
+      #launch .frame {
         position: fixed;
         inset: 0;
         overflow: hidden;
       }
-      .backdrop {
+      #launch .backdrop {
         position: absolute;
         inset: -20px;
         width: calc(100% + 40px);
@@ -58,11 +62,11 @@
       }
       @media (min-aspect-ratio: 9/5) {
         /* very wide screens: soften the scene's edges into the backdrop */
-        .scene {
+        #launch .scene {
           mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
         }
       }
-      .scene {
+      #launch .scene {
         position: absolute;
         left: 50%;
         bottom: 0;
@@ -70,14 +74,14 @@
         height: calc(var(--w) * 0.75);
         translate: -50% 0;
       }
-      .scene img.art {
+      #launch .scene img.art {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         image-rendering: pixelated;
       }
-      .shade {
+      #launch .shade {
         position: fixed;
         inset: 0;
         pointer-events: none;
@@ -85,7 +89,7 @@
           radial-gradient(ellipse 60% 45% at 50% 22%, #000b, transparent 70%),
           radial-gradient(ellipse at 50% 60%, transparent 55%, #000a);
       }
-      .title {
+      #launch .title {
         position: fixed;
         top: clamp(1.5rem, 7vh, 5rem);
         left: 50%;
@@ -94,13 +98,13 @@
         text-align: center;
         z-index: 2;
       }
-      h1 {
+      #launch h1 {
         margin: 0;
         font: 400 clamp(3rem, min(13vw, 16vh), 9rem) / 1.1 "PixelPurl", monospace;
         letter-spacing: 0.04em;
         text-shadow: 6px 6px 0 #3a0a06;
       }
-      .deck {
+      #launch .deck {
         margin: 0.4rem 0 0;
         font-size: clamp(1.25rem, 2vw, 1.5rem);
         line-height: 1.35;
@@ -108,7 +112,7 @@
       }
 
       /* ---- portals: --x is the table's centre, --y its top, in art pixels ---- */
-      .portal {
+      #launch .portal {
         position: absolute;
         left: calc(var(--x) * var(--u));
         top: calc(var(--y) * var(--u));
@@ -120,22 +124,27 @@
         text-decoration: none;
         color: inherit;
         outline: 0;
+        background: none;
+        border: 0;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
       }
-      .portal .gate {
+      #launch .portal .gate {
         width: 100%;
         image-rendering: pixelated;
         animation: bob 2.6s ease-in-out infinite;
         transition: filter 0.2s;
         filter: drop-shadow(0 0 calc(3 * var(--u)) var(--glow));
       }
-      .portal:nth-of-type(2) .gate {
+      #launch .portal:nth-of-type(2) .gate {
         animation-delay: -0.9s;
       }
-      .portal:nth-of-type(3) .gate {
+      #launch .portal:nth-of-type(3) .gate {
         animation-delay: -1.7s;
       }
-      .portal:hover .gate,
-      .portal:focus-visible .gate {
+      #launch .portal:hover .gate,
+      #launch .portal:focus-visible .gate {
         filter: drop-shadow(0 0 calc(6 * var(--u)) var(--glow)) brightness(1.2);
       }
       @keyframes bob {
@@ -144,7 +153,7 @@
         }
       }
       /* scroll label hangs over the table's front edge */
-      .label {
+      #launch .label {
         position: absolute;
         top: calc(100% + 2 * var(--u));
         left: 50%;
@@ -160,62 +169,62 @@
         line-height: 1.05;
         padding-bottom: 3%;
       }
-      .label b {
+      #launch .label b {
         font: 400 max(calc(4.2 * var(--u)), 12px) "PixelPurl", monospace;
       }
-      .nw {
+      #launch .nw {
         white-space: nowrap;
       }
-      .label small {
+      #launch .label small {
         font: 700 max(calc(2.4 * var(--u)), 8.5px) "DM Sans", sans-serif;
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: #7a3a10;
       }
-      .portal:focus-visible .label {
+      #launch .portal:focus-visible .label {
         outline: 3px dashed var(--gold);
         outline-offset: 4px;
       }
       @media (max-aspect-ratio: 4/5) {
         /* phones only see the middle table, so the portals line up across it */
-        .portal {
+        #launch .portal {
           top: calc(132 * var(--u));
         }
-        .portal.l {
+        #launch .portal.l {
           left: calc(92 * var(--u));
         }
-        .portal.r {
+        #launch .portal.r {
           left: calc(148 * var(--u));
         }
         /* two lines per label so the text can be bigger */
-        .label {
+        #launch .label {
           width: min(31vw, 130px);
           aspect-ratio: auto;
           padding: 9px 10px 12px;
           text-wrap: balance;
         }
-        .label b {
+        #launch .label b {
           font-size: min(5.6vw, 22px);
           line-height: 1.1;
         }
-        .label small {
+        #launch .label small {
           display: none;
         }
       }
       @media (max-height: 520px) {
-        .title {
+        #launch .title {
           top: 0.5rem;
         }
-        h1 {
+        #launch h1 {
           font-size: 3rem;
         }
-        .deck {
+        #launch .deck {
           display: none;
         }
       }
 
       /* ---- soul: sits where the case study's CTA was, then flies to a portal ---- */
-      .soul {
+      #launch .soul {
         --sx: 120;
         --sy: 160;
         position: absolute;
@@ -230,7 +239,7 @@
           top 0.9s cubic-bezier(0.6, -0.4, 0.4, 1),
           scale 0.9s;
       }
-      .soul img {
+      #launch .soul img {
         width: 100%;
         image-rendering: pixelated;
         filter: drop-shadow(0 0 calc(4 * var(--u)) #4ac8f0)
@@ -243,10 +252,10 @@
           rotate: 3deg;
         }
       }
-      .soul.go {
+      #launch .soul.go {
         scale: 0.5;
       }
-      .hint {
+      #launch .hint {
         position: absolute;
         left: 50%;
         bottom: calc(4 * var(--u));
@@ -262,7 +271,7 @@
       /* ---- particles the soul bursts into ---- */
       .bit {
         position: fixed;
-        z-index: 9;
+        z-index: 25;
         pointer-events: none;
         image-rendering: pixelated;
       }
@@ -270,7 +279,7 @@
       .fade {
         position: fixed;
         inset: 0;
-        z-index: 10;
+        z-index: 30;
         pointer-events: none;
         background: #000;
         opacity: 0;
@@ -279,122 +288,94 @@
       .fade.on {
         opacity: 1;
       }
-      .soul.gone {
+      #launch .soul.gone {
         opacity: 0;
         transition: opacity 0.1s;
       }
       @media (prefers-reduced-motion: reduce) {
-        .portal .gate,
-        .soul img {
+        #launch .portal .gate,
+        #launch .soul img {
           animation: none;
         }
-        .soul {
+        #launch .soul {
           transition: none;
         }
       }
     </style>
   </head>
-  <body>
-    <div class="frame">
-      <img class="backdrop" src="assets/tavern-back.svg" alt="" />
-      <div class="scene">
-        <img class="art" src="assets/tavern-back.svg" alt="" />
-        <img class="art" src="assets/tavern-front.svg" alt="" />
+  <body class="tavern">
+    <div id="launch">
+      <div class="frame">
+        <img class="backdrop" src="assets/tavern-back.svg" alt="" />
+        <div class="scene">
+          <img class="art" src="assets/tavern-back.svg" alt="" />
+          <img class="art" src="assets/tavern-front.svg" alt="" />
 
-        <a class="portal l" href="builder.html" style="--x: 33; --y: 138; --glow: #e6ecf8">
-          <img class="gate" src="assets/portal-white.svg" alt="" />
-          <span class="label"><b>Start from scratch</b><small>Build every choice</small></span>
-        </a>
-        <a class="portal" href="builder.html#ready" style="--x: 120; --y: 132; --glow: #8a5ae0">
-          <img class="gate" src="assets/portal-purple.svg" alt="" />
-          <span class="label"><b>Use <span class="nw">ready-made</span></b><small>Pick a hero &amp; tweak</small></span>
-        </a>
-        <a class="portal r" href="builder.html#quick" style="--x: 207; --y: 138; --glow: #e0404e">
-          <img class="gate" src="assets/portal-red.svg" alt="" />
-          <span class="label"><b>Bardic Inspiration</b><small>A few quick questions</small></span>
-        </a>
+          <button type="button" class="portal l" data-mode="build" style="--x: 33; --y: 138; --glow: #e6ecf8">
+            <img class="gate" src="assets/portal-white.svg" alt="" />
+            <span class="label"><b>Start from scratch</b><small>Build every choice</small></span>
+          </button>
+          <button type="button" class="portal" data-mode="ready" style="--x: 120; --y: 132; --glow: #8a5ae0">
+            <img class="gate" src="assets/portal-purple.svg" alt="" />
+            <span class="label"><b>Use <span class="nw">ready-made</span></b><small>Pick a hero &amp; tweak</small></span>
+          </button>
+          <button type="button" class="portal r" data-mode="quick" style="--x: 207; --y: 138; --glow: #e0404e">
+            <img class="gate" src="assets/portal-red.svg" alt="" />
+            <span class="label"><b>Bardic Inspiration</b><small>A few quick questions</small></span>
+          </button>
 
-        <div class="soul" id="soul"><img src="assets/soul.svg" alt="" /></div>
-        <p class="hint">Choose a portal</p>
+          <div class="soul" id="soul"><img src="assets/soul.svg" alt="" /></div>
+          <p class="hint">Choose a portal</p>
+        </div>
+      </div>
+      <div class="shade"></div>
+      <header class="title">
+        <h1>Origin</h1>
+        <p class="deck">Every hero starts somewhere.</p>
+        <p class="deck">Where will yours begin?</p>
+      </header>
+    
+    </div>
+
+    <div class="app">
+      <div id="v"></div>
+      <div class="sum" id="sum"></div>
+    </div>
+    <div class="modal" id="m">
+      <div class="sheet">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h2>All Species</h2>
+          <button class="nav" id="x">✕ Close</button>
+        </div>
+        <div class="grid" id="gr"></div>
       </div>
     </div>
-    <div class="shade"></div>
-    <header class="title">
-      <h1>Origin</h1>
-      <p class="deck">Every hero starts somewhere.</p>
-      <p class="deck">Where will yours begin?</p>
-    </header>
+    <div class="modal" id="m2">
+      <div class="sheet">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h2 id="m2t"></h2>
+          <button class="nav" id="x2">✕ Close</button>
+        </div>
+        <div id="m2b"></div>
+      </div>
+    </div>
     <div class="fade" id="fade"></div>
-    <script>
-      // Click a portal: the soul flies into it, bursts into scattering pixels, then we go through.
-      const soul = document.getElementById("soul"),
-        fade = document.getElementById("fade"),
-        calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      let busy = false;
-      document.querySelectorAll(".portal").forEach((p) =>
-        p.addEventListener("click", (e) => {
-          e.preventDefault();
-          if (busy) return;
-          busy = true;
-          const st = getComputedStyle(p),
-            gate = p.querySelector(".gate").getBoundingClientRect();
-          soul.style.setProperty("--sx", st.getPropertyValue("--x"));
-          soul.style.setProperty("--sy", +st.getPropertyValue("--y") - 12);
-          soul.classList.add("go");
-          if (!calm)
-            setTimeout(
-              () =>
-                burst(
-                  gate.left + gate.width / 2,
-                  gate.top + gate.height * 0.4,
-                  st.getPropertyValue("--glow").trim(),
-                ),
-              850,
-            );
-          setTimeout(() => fade.classList.add("on"), calm ? 0 : 1800);
-          setTimeout(() => (location.href = p.href), calm ? 550 : 2350);
-        }),
-      );
-      function burst(x, y, glow) {
-        soul.classList.add("gone");
-        const cols = ["#fff", glow, glow, "#4ac8f0", "#a8f0f0"],
-          reach = Math.max(innerWidth, innerHeight) * 0.6;
-        for (let i = 0; i < 140; i++) {
-          const b = document.createElement("i"),
-            a = Math.random() * Math.PI * 2,
-            d = reach * (0.15 + Math.random() * 0.85),
-            z = 6 + Math.round(Math.random() * 3) * 4,
-            c = cols[i % cols.length];
-          b.className = "bit";
-          b.style.cssText = `left:${x - z / 2}px;top:${y - z / 2}px;width:${z}px;height:${z}px;background:${c};box-shadow:0 0 ${z * 1.5}px ${c}`;
-          document.body.append(b);
-          b.animate(
-            [
-              { transform: "translate(0,0) scale(1)", opacity: 1 },
-              { opacity: 1, offset: 0.6 },
-              {
-                transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + 40}px) scale(.3)`,
-                opacity: 0,
-              },
-            ],
-            {
-              duration: 1100 + Math.random() * 700,
-              delay: Math.random() * 120,
-              easing: "cubic-bezier(.2,.6,.35,1)",
-              fill: "forwards",
-            },
-          );
-        }
-      }
-      // Coming back with the browser's Back button: reset the scene
-      addEventListener("pageshow", () => {
-        busy = false;
-        soul.style.removeProperty("--sx");
-        soul.style.removeProperty("--sy");
-        soul.classList.remove("go", "gone");
-        fade.classList.remove("on");
-        document.querySelectorAll(".bit").forEach((b) => b.remove());
-      });
-    </script>
+    <script src="data.js"></script>
+    <script src="spellsData.js"></script>
+    <script src="spellManager.js"></script>
+    <script src="script.js"></script>
+    <script src="launch.js"></script>
   </body>
 </html>

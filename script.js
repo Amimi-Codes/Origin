@@ -650,10 +650,3 @@ addEventListener("keydown", (e) => {
   if (e.key == "ArrowLeft") go(-1);
 });
 rd();
-if (location.hash == "#ready") exm();
-if (location.hash == "#quick") quiz();
-// Show the site's main address (…/Origin/) whichever portal brought us here.
-// Refreshing goes back to the tavern, which is fine: picks aren't saved yet.
-try {
-  history.replaceState(null, "", "./");
-} catch (e) {}
