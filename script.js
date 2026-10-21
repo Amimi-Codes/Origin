@@ -97,7 +97,7 @@ function sp() {
     res = (l && l.r) || x.r || "—";
   const tr = [...x.tr, ...((l && l.x) || [])];
   $("v").innerHTML =
-    `<div class="stage"><div class="col">${steps()}<a class="nav back" href="index.html">◀ Want a different start? Back to the tavern</a><div class="p" style="flex:1"><div class="k">Heritage</div><h2>${x.n}</h2><p>${x.s}</p>${l && l.d ? `<p><b style="color:var(--g)">${l.n}.</b> ${l.d}</p>` : ""}<div class="note">${x.L.length ? x.lh + ": choose one lineage →" : "No lineages. Every " + x.n + " shares the same traits."}</div></div></div>
+    `<div class="stage"><div class="col">${steps()}<a class="nav back" href="./">◀ Want a different start? Back to the tavern</a><div class="p" style="flex:1"><div class="k">Heritage</div><h2>${x.n}</h2><p>${x.s}</p>${l && l.d ? `<p><b style="color:var(--g)">${l.n}.</b> ${l.d}</p>` : ""}<div class="note">${x.L.length ? x.lh + ": choose one lineage →" : "No lineages. Every " + x.n + " shares the same traits."}</div></div></div>
 <div class="hero">${ch(look())}</div>
 <div class="col"><div class="p"><div class="k">At a glance</div><div class="boxes">${box(spd + " ft", "Speed", "#f3c26b")}${box(x.z.replace(" or ", " / "), "Size", "#e0793a")}${box(dv ? dv + " ft" : "—", "Darkvision", "#9fe0d0")}${box(res, "Resist", "#e58fb6")}</div></div>
 <div class="p" style="flex:1">${x.L.length ? `<div class="k">${x.lh}</div><div class="chips">${x.L.map((q, i) => `<button class="chip ${i == li ? "on" : ""}" data-l="${i}">${q.n}</button>`).join("")}</div>` : ""}<div class="k">Traits</div><ul class="tr">${tr.map((t) => `<li><b>${t[0]}</b>${t[1] ? " · " + t[1] : ""}</li>`).join("")}</ul><button class="cta" id="pk">Choose ${l ? l.n.replace(/ Giant$/, "") : x.n}</button></div></div></div>
@@ -652,3 +652,8 @@ addEventListener("keydown", (e) => {
 rd();
 if (location.hash == "#ready") exm();
 if (location.hash == "#quick") quiz();
+// Show the site's main address (…/Origin/) whichever portal brought us here.
+// Refreshing goes back to the tavern, which is fine: picks aren't saved yet.
+try {
+  history.replaceState(null, "", "./");
+} catch (e) {}
